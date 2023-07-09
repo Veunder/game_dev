@@ -261,3 +261,79 @@ public:
 //        }
 //    }
 };
+
+Level::Level(std::string &&file_name) {
+    ifstream InputFile(file_name);
+    if (InputFile.is_open()) {
+        int h, w;
+        InputFile >> h >> w;
+        if (h < 10 || w < 10) {
+            cout << "Слишком маленькие размеры карты, будет создан дефолтный уровень." << endl;
+            *this = Level("default_map.txt");
+        } else {
+            height = h;
+            width = w;
+            cells.resize(height);
+            for (auto &v: cells) {
+                v.resize(width);
+            }
+            string s;
+            for (int i = 0; i < height; ++i) {
+                InputFile >> s;
+                for (int j = 0; j < width; ++j) {
+                    this->set_cell(i, j, s[j]);
+                }
+            }
+        }
+        InputFile.close();
+    }
+    else {
+        cout << "Не удалось открыть файл, будет создан дефолтный уровень." << endl;
+        *this = Level("default_map.txt");
+    }
+}
+
+int Level::set_cell(int i, int j, char c, Operative *op, Creature *creature, Weapon *weapon,
+                    AmmoContainer *ammoContainer, AidKit *aidKit) {
+
+    if (c == '#') {
+        cells[i][j].set_type(CellType::Wall);
+    }
+    else if (c == '.') {
+        cells[i][j].set_type(CellType::Empty);
+    }
+    else if (c == '=') {
+        cells[i][j].set_type(CellType::Partition);
+    }
+    else if (c == '-') {
+        cells[i][j].set_type(CellType::Glass);
+    }
+    else if (c >= 'a' && c <= 'z') {
+        if (!op) { op = new Operative; }
+        cells[i][j].set_type(CellType::Operative);
+        cells[i][j].set_operative(op);
+        ops.push_back(op);
+    }
+    else if (c >= 'A' && c <= 'Z') {
+        if (!creature) { creature = new Creature; }
+        cells[i][j].set_type(CellType::Creature);
+        cells[i][j].set_creature(creature);
+        creatures.push_back(creature);
+    }
+    else if (c == ')'){
+        if (!ammoContainer) { ammoContainer = new AmmoContainer(WeaponType::Rifle); } // Сделать создание рандомным
+        cells[i][j].set_type(CellType::AmmoContainer);
+        cells[i][j].set_ammoContainer(ammoContainer);
+    }
+    else if (c == '+') {
+        if (!aidKit) {aidKit = new AidKit; }
+        cells[i][j].set_type(CellType::AidKit);
+        cells[i][j].set_aidKit(aidKit);
+    }
+    else if (c == '$') {
+        if (!weapon) { weapon = new Weapon(WeaponType::Rifle); }
+        cells[i][j].set_type(CellType::Weapon);
+        cells[i][j].set_weapon(weapon);
+    }
+    return 0;
+}
