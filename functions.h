@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 
 #ifndef GAME_DEV_C___FUNCTIONS_H
 #define GAME_DEV_C___FUNCTIONS_H
@@ -13,7 +14,7 @@ class Operative {
 protected:
     static char Op_ID;
     char char_id;
-    Weapon *weapon;
+    Weapon *weapon{};
 public:
     Operative ();
 };
@@ -94,14 +95,6 @@ public:
     */
     int set_cell (int i, int j, char c, Operative * op = nullptr, Creature * creature = nullptr,
                   Weapon *weapon = nullptr, AmmoContainer *ammoContainer = nullptr, AidKit *aidKit = nullptr);
-//    string get_level () {
-//        string res;
-//        for (auto &v : cells) {
-//            for (auto &u : v) {
-//
-//            }
-//        }
-//    }
 };
 
 #endif
