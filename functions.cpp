@@ -36,6 +36,15 @@ char Operative::get_char_id() const {
     return char_id;
 }
 
+Creature::Creature() {
+    char_id = Cr_ID;
+    Cr_ID++;
+}
+
+char Creature::get_char_id() const {
+    return char_id;
+}
+
 string enumToString(WeaponType wt) {
     switch (wt) {
         case WeaponType::Pistol:
@@ -205,7 +214,7 @@ int Level::set_cell(int i, int j, char c, Operative *op, Creature *creature, Wea
         cells[i][j].set_type(CellType::Creature);
         cells[i][j].set_creature(creature);
         creatures.push_back(creature);
-
+        cells[i][j].set_symbol(creature->get_char_id());
     }
     else if (c == ')'){
         if (!ammoContainer) { ammoContainer = new AmmoContainer(WeaponType::Rifle); } // Сделать создание рандомным
@@ -237,3 +246,5 @@ void Level::PrintLevel() {
         cout << endl;
     }
 }
+
+

@@ -21,7 +21,12 @@ public:
 };
 
 class Creature {
-
+protected:
+    static char Cr_ID;
+    char char_id;
+public:
+    Creature();
+    [[nodiscard]] char get_char_id() const;
 };
 
 string enumToString(WeaponType wt);
