@@ -17,6 +17,7 @@ protected:
     Weapon *weapon{};
 public:
     Operative ();
+    [[nodiscard]] char get_char_id() const;
 };
 
 class Creature {
@@ -54,6 +55,7 @@ public:
 
 class Cell {
 private:
+    char symbol;
     CellType ct;
     Operative * op;
     Creature * creature;
@@ -61,12 +63,16 @@ private:
     AmmoContainer *ammoContainer;
     AidKit *aidKit;
 public:
+    void set_symbol(char c);
     void set_type (CellType cellType);
     void set_operative (Operative *op_);
     void set_creature (Creature *creature_);
     void set_weapon (Weapon *weapon_);
     void set_ammoContainer (AmmoContainer *ammoContainer_);
     void set_aidKit (AidKit *aidKit_);
+
+    [[nodiscard]] char get_symbol() const;
+
 };
 
 class Level {
@@ -78,6 +84,7 @@ private:
     vector<Creature *> creatures;
 public:
     explicit Level (string &&file_name);
+    void PrintLevel();
 
     [[nodiscard]] int get_width () const { return width; }
     [[nodiscard]] int get_height () const { return height; }
