@@ -25,12 +25,46 @@ enum class CellType {
     Operative
 };
 
-Operative::Operative() {
+char Creature::STATIC_ID = 'A';
+
+Creature::Creature(Point point) {
+    char_id = STATIC_ID;
+    STATIC_ID++;
+    pos = point;
+}
+
+char Creature::get_char_id() const {
+    return char_id;
+}
+
+Operative::Operative(Point point) : Creature(point) {
     char_id = Op_ID;
     Op_ID++;
+    pos = point;
 }
 
 char Operative::Op_ID = 'a';
+
+char Operative::get_char_id() const {
+    return char_id;
+}
+
+int Operative::move(char key) {
+    if (key == 'u'){ //up
+
+    }
+    else if (key == 'd'){ // down
+
+    }
+    else if (key == 'r'){ // right
+
+    }
+    else if (key == 'l'){ // left
+
+    }
+    else { return 1; }
+    return 0;
+}
 
 string enumToString(WeaponType wt) {
     switch (wt) {
@@ -46,7 +80,6 @@ string enumToString(WeaponType wt) {
             return "Unknown";
     }
 }
-
 
 AmmoContainer::AmmoContainer(WeaponType wt_) {
     if (wt_ == WeaponType::Pistol) {
@@ -80,29 +113,29 @@ AidKit::AidKit() {
 }
 
 Weapon::Weapon(WeaponType wt_) : AmmoContainer(wt_){
-        if (wt == WeaponType::Pistol) {
-            damage = 15;
-            fireTime = 1;
-            reloadTime = 2;
-            return;
-        }
-        if (wt == WeaponType::Sniper) {
-            damage = 15;
-            fireTime = 1;
-            reloadTime = 2;
-            return;
-        }
-        if (wt == WeaponType::Shotgun) {
-            damage = 15;
-            fireTime = 1;
-            reloadTime = 2;
-            return;
-        }
-        if (wt == WeaponType::Rifle) {
-            damage = 15;
-            fireTime = 1;
-            reloadTime = 2;
-        }
+    if (wt == WeaponType::Pistol) {
+        damage = 15;
+        fireTime = 1;
+        reloadTime = 2;
+        return;
+    }
+    if (wt == WeaponType::Sniper) {
+        damage = 15;
+        fireTime = 1;
+        reloadTime = 2;
+        return;
+    }
+    if (wt == WeaponType::Shotgun) {
+        damage = 15;
+        fireTime = 1;
+        reloadTime = 2;
+        return;
+    }
+    if (wt == WeaponType::Rifle) {
+        damage = 15;
+        fireTime = 1;
+        reloadTime = 2;
+    }
 }
 
 void Weapon::get_info () {
@@ -133,6 +166,14 @@ void Cell::set_aidKit (AidKit *aidKit_) {
     aidKit = aidKit_;
 }
 
+void Cell::set_symbol(char c) {
+    symbol = c;
+}
+
+char Cell::get_symbol() const {
+    return symbol;
+}
+
 Level::Level(std::string &&file_name) {
     ifstream InputFile(file_name);
     if (InputFile.is_open()) {
@@ -140,7 +181,7 @@ Level::Level(std::string &&file_name) {
         InputFile >> h >> w;
         if (h < 10 || w < 10) {
             cout << "Слишком маленькие размеры карты, будет создан дефолтный уровень." << endl;
-            *this = Level(R"(\\wsl$\Ubuntu\home\andre\game_dev\default_map.txt)");
+            *this = Level("default_map.txt");
         } else {
             height = h;
             width = w;
@@ -159,19 +200,21 @@ Level::Level(std::string &&file_name) {
         InputFile.close();
     }
     else {
+        if (file_name == "default_map.txt"){
+            cout << "Не удалось найти дефолтный уровень, выход." << endl;
+            exit(0);
+        }
         cout << "Не удалось открыть файл, будет создан дефолтный уровень." << endl;
-        *this = Level(R"(\\wsl$\Ubuntu\home\andre\game_dev\default_map.txt)");
+        *this = Level("default_map.txt");
     }
 }
 
 int Level::set_cell(int i, int j, char c, Operative *op, Creature *creature, Weapon *weapon,
                     AmmoContainer *ammoContainer, AidKit *aidKit) {
 
+    cells[i][j].set_symbol(c);
     if (c == '#') {
         cells[i][j].set_type(CellType::Wall);
-    }
-    else if (c == '.') {
-        cells[i][j].set_type(CellType::Empty);
     }
     else if (c == '=') {
         cells[i][j].set_type(CellType::Partition);
@@ -180,16 +223,18 @@ int Level::set_cell(int i, int j, char c, Operative *op, Creature *creature, Wea
         cells[i][j].set_type(CellType::Glass);
     }
     else if (c >= 'a' && c <= 'z') {
-        if (!op) { op = new Operative; }
+        if (!op) { op = new Operative(Point(), Point()); }
         cells[i][j].set_type(CellType::Operative);
         cells[i][j].set_operative(op);
         ops.push_back(op);
+        cells[i][j].set_symbol(op->get_char_id());
     }
     else if (c >= 'A' && c <= 'Z') {
         if (!creature) { creature = new Creature; }
         cells[i][j].set_type(CellType::Creature);
         cells[i][j].set_creature(creature);
         creatures.push_back(creature);
+        cells[i][j].set_symbol(creature->get_char_id());
     }
     else if (c == ')'){
         if (!ammoContainer) { ammoContainer = new AmmoContainer(WeaponType::Rifle); } // Сделать создание рандомным
@@ -206,5 +251,20 @@ int Level::set_cell(int i, int j, char c, Operative *op, Creature *creature, Wea
         cells[i][j].set_type(CellType::Weapon);
         cells[i][j].set_weapon(weapon);
     }
+    else{
+        cells[i][j].set_type(CellType::Empty);
+        cells[i][j].set_symbol('.');
+    }
     return 0;
 }
+
+void Level::PrintLevel() {
+    for (const auto& i : cells){
+        for (auto  j : i){
+            cout << j.get_symbol();
+        }
+        cout << endl;
+    }
+}
+
+
