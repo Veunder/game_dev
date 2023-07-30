@@ -266,5 +266,3 @@ void Level::PrintLevel() {
         cout << endl;
     }
 }
-
-
