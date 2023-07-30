@@ -10,18 +10,29 @@ enum class WeaponType;
 enum class CellType;
 
 class Weapon;
-class Operative {
-protected:
-    static char Op_ID;
-    char char_id;
-    Weapon *weapon{};
-public:
-    Operative ();
-    [[nodiscard]] char get_char_id() const;
+
+struct Point {
+    int x;
+    int y;
 };
 
 class Creature {
+protected:
+    static char STATIC_ID;
+    char char_id;
+    Point pos;
+public:
+    explicit Creature(Point point);
+    [[nodiscard]] char get_char_id() const;
+};
 
+class Operative : Creature{
+protected:
+    Weapon *weapon{};
+public:
+    explicit Operative(Point point);
+    [[nodiscard]] char get_char_id() const;
+    int move(char key);
 };
 
 string enumToString(WeaponType wt);

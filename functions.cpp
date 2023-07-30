@@ -25,15 +25,45 @@ enum class CellType {
     Operative
 };
 
-Operative::Operative() {
+char Creature::STATIC_ID = 'A';
+
+Creature::Creature(Point point) {
+    char_id = STATIC_ID;
+    STATIC_ID++;
+    pos = point;
+}
+
+char Creature::get_char_id() const {
+    return char_id;
+}
+
+Operative::Operative(Point point) : Creature(point) {
     char_id = Op_ID;
     Op_ID++;
+    pos = point;
 }
 
 char Operative::Op_ID = 'a';
 
 char Operative::get_char_id() const {
     return char_id;
+}
+
+int Operative::move(char key) {
+    if (key == 'u'){ //up
+
+    }
+    else if (key == 'd'){ // down
+
+    }
+    else if (key == 'r'){ // right
+
+    }
+    else if (key == 'l'){ // left
+
+    }
+    else { return 1; }
+    return 0;
 }
 
 string enumToString(WeaponType wt) {
@@ -50,7 +80,6 @@ string enumToString(WeaponType wt) {
             return "Unknown";
     }
 }
-
 
 AmmoContainer::AmmoContainer(WeaponType wt_) {
     if (wt_ == WeaponType::Pistol) {
@@ -194,7 +223,7 @@ int Level::set_cell(int i, int j, char c, Operative *op, Creature *creature, Wea
         cells[i][j].set_type(CellType::Glass);
     }
     else if (c >= 'a' && c <= 'z') {
-        if (!op) { op = new Operative; }
+        if (!op) { op = new Operative(Point(), Point()); }
         cells[i][j].set_type(CellType::Operative);
         cells[i][j].set_operative(op);
         ops.push_back(op);
@@ -205,7 +234,7 @@ int Level::set_cell(int i, int j, char c, Operative *op, Creature *creature, Wea
         cells[i][j].set_type(CellType::Creature);
         cells[i][j].set_creature(creature);
         creatures.push_back(creature);
-
+        cells[i][j].set_symbol(creature->get_char_id());
     }
     else if (c == ')'){
         if (!ammoContainer) { ammoContainer = new AmmoContainer(WeaponType::Rifle); } // Сделать создание рандомным
