@@ -15,11 +15,21 @@ class AmmoContainer;
 
 class Inventory;
 
-class level;
+class Level;
 
 struct Point {
     int x;
     int y;
+
+    Point(int i, int j) {
+        x = j;
+        y = i;
+    }
+
+    Point() {
+        x = 0;
+        y = 0;
+    }
 };
 
 class Creature {
@@ -30,16 +40,17 @@ protected:
     Inventory *inventory;
 public:
     explicit Creature(Point point);
-    int move(char key, level &level);
+
+    int move(char key, Level &level);
 
     [[nodiscard]] char get_char_id() const;
 };
 
-class Operative : Creature {
+class Operative : public Creature {
 protected:
     static char Operative_ID;
 public:
-    explicit Operative(Point point1, Point point);
+    explicit Operative(Point point);
 
 
 };
@@ -108,6 +119,7 @@ public:
     void set_aidKit(AidKit *aidKit_);
 
     [[nodiscard]] char get_symbol() const;
+
     CellType get_cell_type();
 
 };
@@ -139,11 +151,16 @@ public:
     8. + - аптечка;
     9. $ - оружие;
     */
+    int set_sell_(int x, int y, Cell cell);
+
     int set_cell(int i, int j, char c, Operative *op = nullptr, Creature *creature = nullptr,
                  Weapon *weapon = nullptr, AmmoContainer *ammoContainer = nullptr, AidKit *aidKit = nullptr);
 
     char get_cell_symbol(int x, int y);
+
     CellType get_cell_type(int x, int y);
+
+    Cell get_cell(int x, int y);
 };
 
 #endif

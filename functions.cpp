@@ -37,7 +37,7 @@ char Creature::get_char_id() const {
     return char_id;
 }
 
-Operative::Operative(Point point1, Point point) : Creature(point1) {
+Operative::Operative(Point point) : Creature(point) {
     char_id = Operative_ID;
     Operative_ID++;
     pos = point;
@@ -45,18 +45,37 @@ Operative::Operative(Point point1, Point point) : Creature(point1) {
 
 char Operative::Operative_ID = 'a';
 
-char Operative::get_char_id() const {
-    return char_id;
-}
-
-int Creature::move(char key, level &level) {
+int Creature::move(char key, Level &level) {
     if (key == 'u') { //up
+        Cell cell = level.get_cell(this->pos.x, this->pos.y - 1);
+        if (cell.get_cell_type() == CellType::Empty) {
+            cell = level.get_cell(this->pos.x, this->pos.y);
+            level.set_cell(this->pos.x, this->pos.y, '.');
+            level.set_cell_(this->pos.x, this->pos.y, level.get_cell(this->pos.x, this->pos.y));
 
+            pos.y--;
+        }
+        if (cell.get_cell_type() == CellType::AidKit) {
+            // поместить в инвентарь
+            pos.y--;
+        }
     } else if (key == 'd') { // down
+        Cell cell = level.get_cell(this->pos.x, this->pos.y + 1);
+        if (cell.get_cell_type() == CellType::Empty) {
+            pos.y++;
+        }
 
     } else if (key == 'r') { // right
+        Cell cell = level.get_cell(this->pos.x + 1, this->pos.y);
+        if (cell.get_cell_type() == CellType::Empty) {
+            pos.x++;
+        }
 
     } else if (key == 'l') { // left
+        Cell cell = level.get_cell(this->pos.x - 1, this->pos.y - 1);
+        if (cell.get_cell_type() == CellType::Empty) {
+            pos.x--;
+        }
 
     } else { return 1; }
     return 0;
@@ -225,13 +244,13 @@ int Level::set_cell(int i, int j, char c, Operative *op, Creature *creature, Wea
     } else if (c == '-') {
         cells[i][j].set_type(CellType::Glass);
     } else if (c >= 'a' && c <= 'z') {
-        if (!op) { op = new Operative(Point(), Point()); }
+        if (!op) { op = new Operative(Point(i, j)); }
         cells[i][j].set_type(CellType::Operative);
         cells[i][j].set_operative(op);
         ops.push_back(op);
         cells[i][j].set_symbol(op->get_char_id());
     } else if (c >= 'A' && c <= 'Z') {
-        if (!creature) { creature = new Creature; }
+        if (!creature) { creature = new Creature(Point(i, j)); }
         cells[i][j].set_type(CellType::Creature);
         cells[i][j].set_creature(creature);
         creatures.push_back(creature);
@@ -265,11 +284,20 @@ void Level::PrintLevel() {
 }
 
 char Level::get_cell_symbol(int x, int y) {
-    return (cells[x][y]).get_symbol();
+    return (cells[y][x]).get_symbol();
 }
 
 CellType Level::get_cell_type(int x, int y) {
-    return (cells[x][y]).get_cell_type();
+    return (cells[y][x]).get_cell_type();
+}
+
+Cell Level::get_cell(int x, int y) {
+    return cells[y][x];
+}
+
+int Level::set_sell_(int x, int y, Cell cell) {
+    cells[y][x] = cell;
+    return 0;
 }
 
 Weapon Inventory::get_weapon() {
