@@ -15,6 +15,8 @@ class AmmoContainer;
 
 class Inventory;
 
+class level;
+
 struct Point {
     int x;
     int y;
@@ -28,6 +30,7 @@ protected:
     Inventory *inventory;
 public:
     explicit Creature(Point point);
+    int move(char key, level &level);
 
     [[nodiscard]] char get_char_id() const;
 };
@@ -38,7 +41,7 @@ protected:
 public:
     explicit Operative(Point point1, Point point);
 
-    int move(char key);
+
 };
 
 string enumToString(WeaponType wt);
@@ -105,6 +108,7 @@ public:
     void set_aidKit(AidKit *aidKit_);
 
     [[nodiscard]] char get_symbol() const;
+    CellType get_cell_type();
 
 };
 
@@ -137,6 +141,9 @@ public:
     */
     int set_cell(int i, int j, char c, Operative *op = nullptr, Creature *creature = nullptr,
                  Weapon *weapon = nullptr, AmmoContainer *ammoContainer = nullptr, AidKit *aidKit = nullptr);
+
+    char get_cell_symbol(int x, int y);
+    CellType get_cell_type(int x, int y);
 };
 
 #endif
