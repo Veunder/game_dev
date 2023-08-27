@@ -49,7 +49,7 @@ char Operative::get_char_id() const {
     return char_id;
 }
 
-int Operative::move(char key) {
+int Creature::move(char key, level &level) {
     if (key == 'u') { //up
 
     } else if (key == 'd') { // down
@@ -175,6 +175,11 @@ char Cell::get_symbol() const {
     return symbol;
 }
 
+CellType Cell::get_cell_type() {
+    return ct;
+}
+
+
 Level::Level(std::string &&file_name) {
     ifstream InputFile(file_name);
     if (InputFile.is_open()) {
@@ -257,6 +262,14 @@ void Level::PrintLevel() {
         }
         cout << endl;
     }
+}
+
+char Level::get_cell_symbol(int x, int y) {
+    return (cells[x][y]).get_symbol();
+}
+
+CellType Level::get_cell_type(int x, int y) {
+    return (cells[x][y]).get_cell_type();
 }
 
 Weapon Inventory::get_weapon() {
